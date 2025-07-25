@@ -1,0 +1,20 @@
+[
+  {
+    "time": "2025-07-21 14:32",
+    "type": "Unauthorized Access",
+    "location": "Gate A",
+    "severity": "High"
+  },
+  {
+    "time": "2025-07-21 16:00",
+    "type": "Gun Threat",
+    "location": "Lobby",
+    "severity": "Critical"
+  },
+  {
+    "time": "2025-07-21 17:45",
+    "type": "Loitering",
+    "location": "Parking Lot",
+    "severity": "Medium"
+  }
+]

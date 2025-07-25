@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SecureSight Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+    header {
+      background: #111;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 10px;
+      width: 300px;
+    }
+    .card h2 {
+      margin-top: 0;
+    }
+    .incident-item {
+      background: #eef2ff;
+      border-left: 5px solid #3b82f6;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .timeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding-top: 20px;
+    }
+    .marker {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .critical { background: red; }
+    .high { background: orange; }
+    .medium { background: blue; }
+    .resolved-btn {
+      background: green;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    select {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+    }
+    .filter-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>SecureSight Dashboard</header>
+
+  <div class="filter-container">
+    <label for="severityFilter">Filter by Severity:</label>
+    <select id="severityFilter">
+      <option value="all">All</option>
+      <option value="critical">Critical</option>
+      <option value="high">High</option>
+      <option value="medium">Medium</option>
+    </select>
+    <p id="incidentCount"></p>
+  </div>
+
+  <div class="container">
+    <!-- Timeline -->
+    <div class="card">
+      <h2>Incident Timeline</h2>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+   <!-- Incident Player -->
+<div class="card">
+  <h2>Incident Player</h2>
+  <select id="cameraSelect" onchange="changeVideo(this.value)">
+    <option value="https://www.w3schools.com/html/mov_bbb.mp4">Camera 1</option>
+    <option value="https://samplelib.com/lib/preview/mp4/sample-5s.mp4">Camera 2</option>
+    <option value="https://samplelib.com/lib/preview/mp4/sample-10s.mp4">Camera 3</option>
+  </select>
+
+  <video id="incidentVideo" width="100%" controls>
+    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<script>
+  function changeVideo(src) {
+    const video = document.getElementById("incidentVideo");
+    video.src = src;
+    video.load();
+    video.play();
+  }
+</script>
+
+    <!-- Incident List -->
+    <div class="card">
+      <h2>Incident List</h2>
+      <div id="incidentList"></div>
+    </div>
+  </div>
+
+  <script>
+    const incidents = [
+      { title: "Unauthorized Access", time: "2025-07-21 14:32", location: "Gate A", severity: "high", videoTime: 5 },
+      { title: "Gun Threat", time: "2025-07-21 16:00", location: "Lobby", severity: "critical", videoTime: 10 },
+      { title: "Loitering", time: "2025-07-21 17:45", location: "Parking Lot", severity: "medium", videoTime: 15 },
+      { title: "Fire Alarm", time: "2025-07-21 18:00", location: "Floor 2", severity: "critical", videoTime: 20 },
+      { title: "Tailgating", time: "2025-07-21 18:30", location: "Gate B", severity: "high", videoTime: 25 },
+      { title: "Object Left Behind", time: "2025-07-21 19:00", location: "Lobby", severity: "medium", videoTime: 30 },
+      { title: "Unattended Bag", time: "2025-07-21 19:15", location: "Gate A", severity: "high", videoTime: 35 },
+      { title: "Suspicious Activity", time: "2025-07-21 19:30", location: "Lobby", severity: "critical", videoTime: 40 },
+      { title: "Vandalism", time: "2025-07-21 19:45", location: "Parking", severity: "medium", videoTime: 45 },
+      { title: "Broken Window", time: "2025-07-21 20:00", location: "Cafeteria", severity: "high", videoTime: 50 },
+      { title: "Intruder", time: "2025-07-21 20:15", location: "Roof", severity: "critical", videoTime: 55 },
+      { title: "Loitering", time: "2025-07-21 20:30", location: "Main Entrance", severity: "medium", videoTime: 60 }
+    ];
+
+    const video = document.getElementById("incidentVideo");
+    const incidentList = document.getElementById("incidentList");
+    const timeline = document.getElementById("timeline");
+    const incidentCount = document.getElementById("incidentCount");
+
+    function renderIncidents(filter = "all") {
+      incidentList.innerHTML = "";
+      timeline.innerHTML = "";
+
+      const filtered = incidents.filter(i => filter === "all" || i.severity === filter);
+
+      filtered.forEach((incident) => {
+        // Incident list
+        const div = document.createElement("div");
+        div.className = "incident-item";
+        div.innerHTML = `<strong>${incident.title}</strong><br>Time: ${incident.time}<br>Location: ${incident.location}<br>Severity: ${incident.severity}<br><button class='resolved-btn'>Mark as Resolved</button>`;
+        div.querySelector('button').onclick = () => {
+          div.style.opacity = 0.5;
+          div.querySelector('button').disabled = true;
+          div.querySelector('button').innerText = 'Resolved';
+        };
+        incidentList.appendChild(div);
+
+        // Timeline dot
+        const dot = document.createElement("div");
+        dot.className = `marker ${incident.severity}`;
+        dot.onclick = () => video.currentTime = incident.videoTime;
+        timeline.appendChild(dot);
+      });
+
+      incidentCount.textContent = `Showing ${filtered.length} incident(s)`;
+    }
+
+    document.getElementById("cameraSelect").addEventListener("change", function () {
+      video.src = this.value;
+      video.load();
+    });
+
+    document.getElementById("severityFilter").addEventListener("change", function () {
+      renderIncidents(this.value);
+    });
+
+    renderIncidents(); // Initial render
+  </script>
+</body>
+</html>
+
